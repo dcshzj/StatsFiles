@@ -91,7 +91,7 @@ def makemonthname():
 
 def dldmd5sum():
 	global month, year
-	os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/md5sums.txt" % (year, year, month))
+	os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%s/%s-%s/md5sums.txt" % (year, year, month))
 
 def createitem():
 	global month, monthname, year
@@ -106,14 +106,15 @@ def createitem():
 			'--header', '"authorization: LOW %s:%s"' % (accesskey,secretkey),
 			'--upload-file', "md5sums.txt http://s3.us.archive.org/%s/md5sums.txt" % (identifier),
 			]
+	os.system(' '.join(curl))
 
 def generatestuff():
 	global desc, identifier, month, monthname, year
 	# Generate the identifier first
-	identifier = "wikipedia_visitor_stats_%d%d" % (year, month)
+	identifier = "wikipedia_visitor_stats_%s%s" % (year, month)
 	# Now generate the description
 	tempdesc = ['Two log files (pagecounts, projectcounts) for each hour of',
-			'%s %d.' % (monthname, year),
+			'%s %s.' % (monthname, year),
 			'The timestamp is in the filename.',
 			'The files were produced like this by Domas Mituzas, copied verbatim from his server',
 			'and uploaded to the Internet Archive.',

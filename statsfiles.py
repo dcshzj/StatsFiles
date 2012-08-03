@@ -116,6 +116,7 @@ def process():
 	welcome()
 	findidentifier()
 	makelastday()
+	dldfiles()
 	bye()
 
 if __name__ == "__main__":

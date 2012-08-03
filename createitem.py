@@ -42,48 +42,28 @@ def bye(itemname):
 def makemonthname():
 	global lastday, month, monthname, year
 	if (month == "01"):
-		lastday = "31"
 		monthname = "January"
 	elif (month == "02"):
-		# Leap years, support for the next 3 leap years only
-		if (year == "2012"):
-			lastday = "29"
-		elif (year == "2016"):
-			lastday = "29"
-		elif (year == "2020"):
-			lastday = "29"
-		else:
-			lastday = "28"
 		monthname = "February"
 	elif (month == "03"):
-		lastday = "31"
 		monthname = "March"
 	elif (month == "04"):
-		lastday = "30"
 		monthname = "April"
 	elif (month == "05"):
-		lastday = "31"
 		monthname = "May"
 	elif (month == "06"):
-		lastday = "30"
 		monthname = "June"
 	elif (month == "07"):
-		lastday = "31"
 		monthname = "July"
 	elif (month == "08"):
-		lastday = "31"
 		monthname = "August"
 	elif (month == "09"):
-		lastday = "30"
 		monthname = "September"
 	elif (month == "10"):
-		lastday = "31"
 		monthname = "October"
 	elif (month == "11"):
-		lastday = "30"
 		monthname = "November"
 	elif (month == "12"):
-		lastday = "31"
 		monthname = "December"
 	else:
 		print "ERROR: Month variable needs to be an integer! If the number is a single value, add a zero at the back please!"

@@ -21,8 +21,6 @@ import os
 import sys
 
 # Configuration
-accesskey = ""
-secretkey = ""
 collection = "wikimedia-other"
 mediatype = "web"
 

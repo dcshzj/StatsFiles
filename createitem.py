@@ -78,12 +78,6 @@ def dldmd5sum():
 
 def createitem():
 	global desc, month, monthname, title, year
-	conn = boto.connect_s3(host='s3.us.archive.org', is_secure=False)
-	bucket = conn.get_bucket(identifier)
-	if not bucket:
-		bucket = conn.create_bucket(identifier)
-	k = Key(bucket)
-	k.key = "md5sums.txt"
 	headers = {}
 	headers['x-archive-queue-derive'] = '0'
 	headers['x-archive-meta-title'] = title
@@ -91,7 +85,13 @@ def createitem():
 	headers['x-archive-meta-mediatype'] = mediatype
 	headers['x-archive-size-hint'] = sizehint
 	headers['x-archive-meta-description'] = desc
-	k.set_contents_from_filename("md5sums.txt",headers=headers)
+	conn = boto.connect_s3(host='s3.us.archive.org', is_secure=False)
+	bucket = conn.get_bucket(identifier)
+	if not bucket:
+		bucket = conn.create_bucket(identifier,headers=headers)
+	k = Key(bucket)
+	k.key = "md5sums.txt"
+	k.set_contents_from_filename("md5sums.txt")
 
 def generatestuff():
 	global desc, identifier, month, monthname, title, year

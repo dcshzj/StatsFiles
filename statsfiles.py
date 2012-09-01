@@ -20,6 +20,9 @@ from boto.s3.key import Key
 import os
 import sys
 
+# Configuration
+path = "" # Path to temporarily store the stats files
+
 # Nothing to change below
 day = ""
 identifier = ""

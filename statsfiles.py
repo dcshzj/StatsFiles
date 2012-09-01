@@ -74,7 +74,7 @@ def makelastday():
 		print "ERROR: Month variable needs to be an integer! If the number is a single value, add a zero at the back please!"
 		sys.exit() # Exit, there is nothing we need to do already zzz
 
-def findidentifier()
+def findidentifier():
 	global identifier, month, year
 	identifier = "wikipedia_visitor_stats_%s%s" % (year, month)
 

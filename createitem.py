@@ -20,13 +20,8 @@ from boto.s3.key import Key
 import os
 import sys
 
-# Configuration
-collection = "wikimedia-other"
-mediatype = "web"
-
+# Configuration to go into settings.py!
 # Nothing to change below...
-month = sys.argv[1]
-year = sys.argv[2]
 desc = "" # Item description
 identifier = "" # Item URL
 lastday = ""

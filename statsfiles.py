@@ -20,16 +20,12 @@ from boto.s3.key import Key
 import os
 import sys
 
-# Configuration
-path = "" # Path to temporarily store the stats files
-
+# Configuration to go into settings.py!
 # Nothing to change below
 day = ""
 identifier = ""
 lastday = ""
-month = sys.argv[1]
 monthname = ""
-year = sys.argv[2]
 # Can't help but make it this hackish...
 hours = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'}
 

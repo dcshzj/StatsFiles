@@ -21,15 +21,17 @@ import os
 import sys
 
 # Configuration
-path = "" # Path to temporarily store the stats files
+path = "." # Path to temporarily store the stats files
 
 # Nothing to change below
 day = ""
 identifier = ""
 lastday = ""
-month = sys.argv[1]
+month = int(sys.argv[1])
 monthname = ""
-year = sys.argv[2]
+year = int(sys.argv[2])
+filename = ""
+count = 0
 # Can't help but make it this hackish...
 hours = {'00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23'}
 
@@ -41,38 +43,38 @@ def bye():
 
 def makelastday():
 	global lastday, month, monthname, year
-	if (month == "01"):
-		lastday = "31"
-	elif (month == "02"):
+	if (month == 1):
+		lastday = "32"
+	elif (month == 2):
 		# Leap years, support for the next 3 leap years only
 		if (year == "2012"):
-			lastday = "29"
+			lastday = "30"
 		elif (year == "2016"):
-			lastday = "29"
+			lastday = "30"
 		elif (year == "2020"):
-			lastday = "29"
+			lastday = "30"
 		else:
-			lastday = "28"
-	elif (month == "03"):
+			lastday = "29"
+	elif (month == 3):
+		lastday = "32"
+	elif (month == 4):
 		lastday = "31"
-	elif (month == "04"):
-		lastday = "30"
-	elif (month == "05"):
+	elif (month == 5):
+		lastday = "32"
+	elif (month == 6):
 		lastday = "31"
-	elif (month == "06"):
-		lastday = "30"
-	elif (month == "07"):
+	elif (month == 7):
+		lastday = "32"
+	elif (month == 8):
+		lastday = "32"
+	elif (month == 9):
 		lastday = "31"
-	elif (month == "08"):
+	elif (month == 10):
+		lastday = "32"
+	elif (month == 11):
 		lastday = "31"
-	elif (month == "09"):
-		lastday = "30"
-	elif (month == "10"):
-		lastday = "31"
-	elif (month == "11"):
-		lastday = "30"
-	elif (month == "12"):
-		lastday = "31"
+	elif (month == 12):
+		lastday = "32"
 	else:
 		print "ERROR: Month variable needs to be an integer! If the number is a single value, add a zero at the back please!"
 		sys.exit() # Exit, there is nothing we need to do already zzz
@@ -81,29 +83,123 @@ def findidentifier():
 	global identifier, month, year
 	identifier = "wikipedia_visitor_stats_%s%s" % (year, month)
 
-def dldfiles():
-	global day, hours, lastday, month, path, year
+def generateFilenamelessthanten(syear, smonth, sday, shour):
+	global filename
+	if (smonth < 10):
+		if (shour < 10):
+			if (sday < 10):
+				filename = "pagecounts-%d0%d0%d-0%d0000.gz" % (syear, smonth, sday, shour)
+			else:
+				filename = "pagecounts-%d0%d%d-0%d0000.gz" % (syear, smonth, sday, shour)
+		else:
+			if (sday < 10):
+				filename = "pagecounts-%d0%d0%d-%d0000.gz" % (syear, smonth, sday, shour)
+			else:
+				filename = "pagecounts-%d0%d%d-%d0000.gz" % (syear, smonth, sday, shour)
+	else:
+		if (shour < 10):
+			if (sday < 10):
+				filename = "pagecounts-%d%d0%d-0%d0000.gz" % (syear, smonth, sday, shour)
+			else:
+				filename = "pagecounts-%d%d%d-0%d0000.gz" % (syear, smonth, sday, shour)
+		else:
+			if (sday < 10):
+				filename = "pagecounts-%d%d0%d-%d0000.gz" % (syear, smonth, sday, shour)
+			else:
+				filename = "pagecounts-%d%d%d-%d0000.gz" % (syear, smonth, sday, shour)
+
+def dldfilesoctnovdec():
+	global day, hours, lastday, month, path, year, filename, count
 	os.chdir(path)
-	madeupday = lastday + 1
-	day = 1 # Lets start off with the first day of the month
-	hour = 01
-	while (day < madeupday):
-		for hour in hours:
-			filename = "pagecounts-%s%s%s-%s0000.gz" % (year, month, day, hour)
-			os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%s/%s-%s/%s") % (year, year, month, filename)
+	day = 01 # Lets start off with the first day of the month
+	if (day < 10):
+		if (count == 0):
+			generateFilenamelessthanten(year, month, day, hour)
+			print filename
+			os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
 			if (os.path.exists(filename)):
 				uploadfile(filename)
 				brotherfile = "projectcounts-%s%s%s-%s0000" % (year, month, day, hour)
-				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%s/%s-%s/%s") % (year, year, month, brotherfile)
+				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
 				uploadfile(brotherfile)
 			else:
 				filename = "pagecounts-%s%s%s-%s0001.gz" % (year, month, day, hour)
-				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%s/%s-%s/%s") % (year, year, month, filename)
+				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
 				uploadfile(filename)
 				brotherfile = "projectcounts-%s%s%s-%s0001" % (year, month, day, hour)
-				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%s/%s-%s/%s") % (year, year, month, brotherfile)
+				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
 				uploadfile(brotherfile)
 			day += 1
+			count += 1
+		else:
+			for hour in hours:
+				if (day == 01 and hour == 00):
+					continue
+				else:
+					generateFilename(year, month, day, hour)
+					print filename
+					os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
+					if (os.path.exists(filename)):
+						uploadfile(filename)
+						brotherfile = "projectcounts-%s%s%s-%s0000" % (year, month, day, hour)
+						os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
+						uploadfile(brotherfile)
+					else:
+						filename = "pagecounts-%s%s%s-%s0001.gz" % (year, month, day, hour)
+						os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
+						uploadfile(filename)
+						brotherfile = "projectcounts-%s%s%s-%s0001" % (year, month, day, hour)
+						os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
+						uploadfile(brotherfile)
+					day += 1
+			count = 0
+
+def dldfilesrest():
+	global day, hours, lastday, month, path, year, filename, count
+	os.chdir(path)
+	day = 01 # Lets start off with the first day of the month
+	if (day < 10):
+		if (count == 0):
+			hour = 00
+			generateFilenamelessthanten(year, month, day, hour)
+			print filename
+			os.system('wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s') % (year, year, month, filename)
+			if (os.path.exists(filename)):
+				uploadfile(filename)
+				brotherfile = "projectcounts-%s%s%s-%s0000" % (year, month, day, hour)
+				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
+				uploadfile(brotherfile)
+			else:
+				filename = "pagecounts-%s%s%s-%s0001.gz" % (year, month, day, hour)
+				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
+				uploadfile(filename)
+				brotherfile = "projectcounts-%s%s%s-%s0001" % (year, month, day, hour)
+				os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
+				uploadfile(brotherfile)
+			day += 1
+			count += 1
+		else:
+			for hour in hours:
+				if (day == 01 and hour == 00):
+					continue
+				else:
+					generateFilename(year, month, day, hour)
+					print filename
+					os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
+					if (os.path.exists(filename)):
+						uploadfile(filename)
+						brotherfile = "projectcounts-%s%s%s-%s0000" % (year, month, day, hour)
+						os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
+						uploadfile(brotherfile)
+					else:
+						filename = "pagecounts-%s%s%s-%s0001.gz" % (year, month, day, hour)
+						os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, filename)
+						uploadfile(filename)
+						brotherfile = "projectcounts-%s%s%s-%s0001" % (year, month, day, hour)
+						os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%d/%d-%d/%s") % (year, year, month, brotherfile)
+						uploadfile(brotherfile)
+					day += 1
+			count = 0
 
 def uploadfile(thefile):
 	global identifier
@@ -117,11 +213,18 @@ def uploadfile(thefile):
 	headers['x-archive-queue-derive'] = '0'
 	k.set_contents_from_filename(thefile,headers=headers,num_cb=10)
 
+def shuffler():
+	global month
+	if (month < 10):
+		dldfilesrest()
+	else:
+		dldfilesoctnovdec()
+
 def process():
 	welcome()
 	findidentifier()
 	makelastday()
-	dldfiles()
+	shuffler()
 	bye()
 
 if __name__ == "__main__":

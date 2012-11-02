@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import boto
-from boto.s3.key import Key
 import os
 import sys
 
@@ -27,7 +25,6 @@ identifier = "" # Item URL
 lastday = ""
 monthname = ""
 sizehint = "107374182400" # 100GB
-title = ""
 
 def welcome():
 	print "Welcome to the item creator script for the Wikimedia visitor statistics files!"
@@ -70,24 +67,22 @@ def dldmd5sum():
 	os.system("wget -c http://dumps.wikimedia.org/other/pagecounts-raw/%s/%s-%s/md5sums.txt" % (year, year, month))
 
 def createitem():
-	global desc, month, monthname, title, year
-	headers = {}
-	headers['x-archive-queue-derive'] = '0'
-	headers['x-archive-meta-title'] = title
-	headers['x-archive-meta01-collection'] = collection
-	headers['x-archive-meta-mediatype'] = mediatype
-	headers['x-archive-size-hint'] = sizehint
-	headers['x-archive-meta-description'] = desc
-	conn = boto.connect_s3(host='s3.us.archive.org', is_secure=False)
-	bucket = conn.get_bucket(identifier)
-	if not bucket:
-		bucket = conn.create_bucket(identifier,headers=headers)
-	k = Key(bucket)
-	k.key = "md5sums.txt"
-	k.set_contents_from_filename("md5sums.txt")
+	global month, monthname, year
+	curl = ['curl', '--retry 20', '--location',
+		'--header', "'x-amz-auto-make-bucket:1'",
+		'--header', "'x-archive-meta01-collection:%s'" % (collection),
+		'--header', "'x-archive-meta-mediatype:%s'" % (mediatype),
+		'--header', "'x-archive-queue-derive:0'",
+		'--header', "'x-archive-size-hint:%s'" % (sizehint),
+		'--header', "'x-archive-meta-title:Wikimedia projects visitor statistics, raw hourly logfiles for %s %s (%s %s)'" % (monthname, year, monthname, year),
+		'--header', "'x-archive-meta-description:%s'" % (desc),
+		'--header', '"authorization: LOW %s:%s"' % (accesskey,secretkey),
+		'--upload-file', "md5sums.txt http://s3.us.archive.org/%s/md5sums.txt" % (identifier),
+		]
+	os.system(' '.join(curl))
 
 def generatestuff():
-	global desc, identifier, month, monthname, title, year
+	global desc, identifier, month, monthname, year
 	# Generate the identifier first
 	identifier = "wikipedia_visitor_stats_%s%s" % (year, month)
 	# Now generate the description
@@ -99,7 +94,6 @@ def generatestuff():
 			'For documentation see the oldest files from December 2007 or the new Wikimedia Foundation host.',
 			]
 	desc = ' '.join(tempdesc)
-	title = "Wikimedia projects visitor statistics, raw hourly logfiles for %s %s (%s %s)'" % (monthname, year, monthname, year)
 
 def process():
 	global identifier

@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import boto
-from boto.s3.key import Key
 import os
 import sys
 
@@ -102,16 +100,12 @@ def dldfiles():
 			day += 1
 
 def uploadfile(thefile):
-	global identifier
-	conn = boto.connect_s3(host='s3.us.archive.org', is_secure=False)
-	bucket = conn.get_bucket(identifier) # Item should have been created by createitem.py
-	if not bucket:
-		sys.exit("ERROR: You need to run createitem.py first before running this script!")
-	k = Key(bucket)
-	k.key = thefile
-	headers = {}
-	headers['x-archive-queue-derive'] = '0'
-	k.set_contents_from_filename(thefile,headers=headers,num_cb=10)
+	global accesskey, identifier, secretkey
+	curl = ['curl', '--retry 20', '--location',
+		'--header', '"authorization: LOW %s:%s"' % (accesskey,secretkey),
+		'--upload-file', "%s http://s3.us.archive.org/%s/%s" % (thefile, identifier, thefile),
+		]
+	os.system(' '.join(curl))
 
 def process():
 	welcome()

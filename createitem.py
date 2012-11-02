@@ -17,8 +17,18 @@
 
 import os
 import sys
+import settings
 
 # Configuration to go into settings.py!
+# Declare those globals first
+accesskey = settings.accesskey
+secretkey = settings.secretkey
+collection = settings.collection
+mediatype = settings.mediatype
+path = settings.path
+month = settings.month
+year = settings.year
+
 # Nothing to change below...
 desc = "" # Item description
 identifier = "" # Item URL

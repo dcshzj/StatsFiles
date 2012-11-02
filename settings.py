@@ -2,6 +2,8 @@
 # For the S3 API keys, please place them inside ~/.boto
 
 # Archive.org matters
+accesskey = ""
+secretkey = ""
 collection = "wikimedia-other"
 mediatype = "web"
 
